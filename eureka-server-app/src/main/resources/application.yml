@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: eureka-server-app
+
+  output:
+    ansi:
+      enabled: always
+
+server:
+  port: 8761  # Server ye port lo run avvalo cheppandi
+
+eureka:
+  client:
+    register-with-eureka: false  # "Nenu Eureka server ni, nenu register cheskonu" ani cheppadaniki
+    fetch-registry: false  # "Nenu vere services list ni fetch cheskovalsina avasaram ledu" ani cheppadaniki
+
+  instance:
+    prefer-ip-address: true  # Register with IP address instead of hostname

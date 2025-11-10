@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="payment-service-app" />
+        <module name="order-service-app" />
+        <module name="configserver" />
+        <module name="api-gateway-app" />
+        <module name="notification-service-app" />
+        <module name="product-service-app" />
+        <module name="sample-testing" />
+        <module name="config-client-app" />
+        <module name="eureka-server-app" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway-app" options="-parameters" />
+      <module name="config-client-app" options="-parameters" />
+      <module name="configserver" options="-parameters" />
+      <module name="eureka-server-app" options="-parameters" />
+      <module name="notification-service-app" options="-parameters" />
+      <module name="order-service-app" options="-parameters" />
+      <module name="payment-service-app" options="-parameters" />
+      <module name="product-service-app" options="-parameters" />
+      <module name="sample-testing" options="-parameters" />
+    </option>
+  </component>
+</project>

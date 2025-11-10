@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: notification-service-app # Eureka lo ee peru tho register avuthundi
+
+  # ----------------------------------------------------
+  # 1. KAFKA CONFIGURATION (The Post Box 📮 Address)
+  # ----------------------------------------------------
+  kafka:
+    consumer:
+      # Kafka server address (default ga port 9092 lo run avuthundi)
+      bootstrap-servers: localhost:9092
+      # Ee consumer ye group ki chendindo cheppadaniki (oke message ni chala sarlu process cheyyakunda)
+      group-id: notification-group
+      # Kafka ki pampina message format (Key=String, Value=String)
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+server:
+  port: 8084 # Ee service kosam kotha port
+
+
+
+# ----------------------------------------------------
+# 2. EUREKA CONFIGURATION
+# ----------------------------------------------------
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+#logging:
+#  pattern:
+#    # Simple, clean console pattern - no horizontal scrolling needed
+#    console: "%d{HH:mm:ss.SSS} %highlight(%-5level) : %msg%n"
+#    # Detailed file pattern with full logger names
+#    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} : %msg%n"

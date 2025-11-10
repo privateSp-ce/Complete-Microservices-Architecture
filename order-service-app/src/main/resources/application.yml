@@ -1,0 +1,138 @@
+spring:
+  application:
+    name: order-service-app
+
+  #  {application-name}-{profile}(optional).properties
+  # Checks order-service-app.properties in GIT
+  config:
+    import: configserver:http://localhost:8888  # Tell the client where to find the Config Server
+
+  rabbitmq:  # RabbitMQ connection details - Listening message from RabbitMq
+    host: localhost
+    username: guest
+    password: guest
+
+  output:
+    ansi:
+      enabled: always
+
+  devtools:
+    restart:
+      enabled: true  # Restart feature enable
+      additional-paths:
+        - src/main/java  # Watch ee directory
+      exclude: static/**,public/**  # Ee directories ignore cheyyi
+    livereload:
+      enabled: true  # Browser live reload enable
+      # port: 35729  # LiveReload server port
+
+  # Kafka Configuration (Producer side)
+  kafka:
+    producer:
+      # Kafka server address
+      bootstrap-servers: localhost:9092
+      # Message format (Key=String, Value=String)
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+  # ----------------------------------------------------
+  # FIX: Tell Spring Cloud Stream which binder is default
+  # ----------------------------------------------------
+  cloud:
+    stream:
+      default-binder: kafka # Default ga Kafka ni vaadu ani cheptunnam
+    bus:
+      enabled: true
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/  # Eureka Server ekkada undo cheppadaniki
+
+  instance:
+    prefer-ip-address: true  # Register with IP address instead of hostname
+
+# ============================================
+# Resilience4j Circuit Breaker Configuration
+# ============================================
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      productServiceBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+        slidingWindowType: COUNT_BASED
+        recordExceptions:  # Record specific exceptions that should be counted as failures
+          - org.springframework.web.client.ResourceAccessException
+          - java.net.ConnectException
+          - java.io.IOException
+
+  timelimiter:  # Time Limiter Configuration (Optional - adds timeout protection)
+    instances:
+      productServiceBreaker:
+        timeoutDuration: 5s
+        cancelRunningFuture: true
+
+management:  # Actuator endpoints to monitor circuit breaker health
+  endpoints:
+    web:
+      exposure:
+        include: health,info,circuitbreakers,circuitbreakerevents, busrefresh,metrics,prometheus
+
+  endpoint:
+    health:
+      show-details: always
+
+  health:
+    circuitbreakers:
+      enabled: true
+
+  # ----------------------------------------------------
+  # DISTRIBUTED TRACING (ZIPKIN) CONFIGURATION
+  # ----------------------------------------------------
+  #  Tells Micrometer "send trace data HERE" - without this, traces are created but never sent anywhere
+  #  Without endpoint: Traces would be generated in-memory but never reach Zipkin UI - you'd see traceId in logs but no visual timeline.
+  zipkin:
+    tracing:
+      # Mana Zipkin dashboard address
+      endpoint: http://localhost:9411/api/v2/spans
+  tracing:
+    # Ee service nunchi vache prathi request ni trace cheyyadaniki
+    # Tells it to trace 100% of requests (1.0). In production, you'd use 0.1 (10%) to reduce overhead
+    sampling:
+      probability: 1.0 # 1.0 ante 100% of requests ni trace cheyyi ani ardam
+    propagation:
+      type: W3C  # or B3 - use same format in all services
+      produce: W3C  # What format to send
+      consume: [ W3C, B3 ]  # What formats to accept
+
+  metrics:
+    tags:
+      application: ${spring.application.name}  # Tag all metrics with service name
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true  # Generate histograms for request duration
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs  # Default path, manam customize cheyachu
+  swagger-ui:
+    enabled: false  # Gateway lo matrame Swagger UI enable cheyyali
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
