@@ -7,18 +7,18 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="sample-testing" />
+        <module name="order-service-app" />
+        <module name="payment-service-app" />
+        <module name="api-gateway-app" />
+        <module name="configserver" />
+        <module name="notification-service-app" />
+        <module name="product-service-app" />
+        <module name="config-client-app" />
+        <module name="eureka-server-app" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="api-gateway-app" target="21" />
-      <module name="config-client-app" target="21" />
-      <module name="configserver" target="21" />
-      <module name="eureka-server-app" target="21" />
-      <module name="notification-service-app" target="21" />
-      <module name="order-service-app" target="21" />
-      <module name="payment-service-app" target="21" />
-      <module name="product-service-app" target="21" />
+      <module name="sample-testing" target="21" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

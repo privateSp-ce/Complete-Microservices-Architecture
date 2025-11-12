@@ -13,6 +13,14 @@
         <option value="$PROJECT_DIR$/order-service-app/pom.xml" />
         <option value="$PROJECT_DIR$/sample-testing/pom.xml" />
         <option value="$PROJECT_DIR$/notification-service-app/pom.xml" />
+        <option value="$PROJECT_DIR$/services/api-gateway-app/pom.xml" />
+        <option value="$PROJECT_DIR$/services/config-client-app/pom.xml" />
+        <option value="$PROJECT_DIR$/services/configserver/pom.xml" />
+        <option value="$PROJECT_DIR$/services/eureka-server-app/pom.xml" />
+        <option value="$PROJECT_DIR$/services/notification-service-app/pom.xml" />
+        <option value="$PROJECT_DIR$/services/order-service-app/pom.xml" />
+        <option value="$PROJECT_DIR$/services/payment-service-app/pom.xml" />
+        <option value="$PROJECT_DIR$/services/product-service-app/pom.xml" />
       </list>
     </option>
   </component>

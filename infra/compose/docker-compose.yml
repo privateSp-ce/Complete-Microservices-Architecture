@@ -1,7 +1,15 @@
+version: "3.9"
+
+name: microservices-infra
+
+networks:
+  elastic:
+    driver: bridge
+
 services:
-  # ======================================================================================================
-  # Zookeeper & Kafka - Distributed messaging system for asynchronous communication between microservices
-  # ======================================================================================================
+  # =============================
+  # Messaging: Zookeeper + Kafka
+  # =============================
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.1
     container_name: zookeeper
@@ -10,83 +18,72 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+    networks: [elastic]
 
   kafka:
     image: confluentinc/cp-kafka:7.6.1
     container_name: kafka
     ports:
       - "9092:9092"
-    depends_on:
-      - zookeeper
+    depends_on: [zookeeper]
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # Keep localhost for producers on the HOST machine
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks: [elastic]
 
-  # ==================================================
-  # Elasticsearch - Stores and indexes logs
-  # ==================================================
+  # =============================
+  # Elasticsearch + Logstash + Kibana (logs)
+  # =============================
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1 # Use a specific recent version
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
     container_name: elasticsearch
     environment:
-      - discovery.type=single-node         # Run as a single node cluster
-      - xpack.security.enabled=false       # Disable security for local dev (easier setup)
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m     # Limit memory usage (adjust if needed)
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ports:
-      - "9200:9200" # Port for Elasticsearch API
-      - "9300:9300" # Port for internal cluster communication
+      - "9200:9200"
+      - "9300:9300"
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1" ]
+      test: ["CMD-SHELL", "curl -sf http://elasticsearch:9200 >/dev/null || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
       start_period: 40s
-    networks:
-      - elastic # Create a network for ELK components
+    networks: [elastic]
 
-  # ==================================================
-  # Logstash - Collects logs from Spring Boot apps (via TCP port 5044) and forwards to Elasticsearch
-  # ==================================================
   logstash:
     image: docker.elastic.co/logstash/logstash:8.11.1
     container_name: logstash
     volumes:
-      - ./logstash/pipeline:/usr/share/logstash/pipeline  # Mount config directory
+      - ./../observability/logs/logstash/pipeline:/usr/share/logstash/pipeline
     ports:
-      - "5044:5044"  # TCP input from Spring Boot
-      - "9600:9600"  # Logstash monitoring API
+      - "5044:5044"
+      - "9600:9600"
     environment:
       - LS_JAVA_OPTS=-Xms256m -Xmx256m
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-    depends_on:
-      - elasticsearch
-    networks:
-      - elastic
+    depends_on: [elasticsearch]
+    networks: [elastic]
 
-  # ==================================================
-  # kibana - Web UI to visualize and search logs
-  # ==================================================
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.11.1 # Use the same version as Elasticsearch
+    image: docker.elastic.co/kibana/kibana:8.11.1
     container_name: kibana
     ports:
-      - "5601:5601" # Port for Kibana web UI
+      - "5601:5601"
     environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200 # Tell Kibana where Elasticsearch is
-    depends_on:
-      - elasticsearch # Wait for Elasticsearch to be ready
-    networks:
-      - elastic
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on: [elasticsearch]
+    networks: [elastic]
 
-  # ==> Monitoring Stack START
-
-  # ==================================================
-  # PROMETHEUS - Scrapes metrics from your Spring Boot services (expects /actuator/prometheus endpoints)
-  # ==================================================
+  # =============================
+  # Metrics: Prometheus + Grafana
+  # =============================
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -98,13 +95,9 @@ services:
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Single config file - no folder needed
-    networks:
-      - elastic
+      - ./../observability/metrics/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks: [elastic]
 
-  # ==================================================
-  # GRAFANA - Visualizes Prometheus metrics with dashboards
-  # ==================================================
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -115,46 +108,34 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
-    networks:
-      - elastic
-    depends_on:
-      - prometheus
+      - ./../observability/metrics/grafana/provisioning:/etc/grafana/provisioning
+    depends_on: [prometheus]
+    networks: [elastic]
 
-  # ==> Monitoring Stack END
-
-  # ==================================================
-  # RABBITMQ - Alternative message broker, used here specifically for Spring Cloud Bus to refresh configurations dynamically
-  # ==================================================
+  # =============================
+  # RabbitMQ (for Spring Cloud Bus)
+  # =============================
   rabbitmq:
     image: rabbitmq:3.9-management
     container_name: rabbitmq
     ports:
-      - "5672:5672" # Port for RabbitMQ messaging
-      - "15672:15672" # Port for RabbitMQ management UI
+      - "5672:5672"
+      - "15672:15672"
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
-    networks:
-      - elastic
+    networks: [elastic]
 
-  # ==================================================
-  # ZIPKIN - Capturing api calls and Traces
-  # ==================================================
+  # =============================
+  # Zipkin (traces → ES)
+  # =============================
   zipkin:
     image: openzipkin/zipkin:latest
     container_name: zipkin
     ports:
-      - "9411:9411" # Port for Zipkin web UI and API
+      - "9411:9411"
     environment:
       - STORAGE_TYPE=elasticsearch
-      - ES_HOSTS=http://elasticsearch:9200 # Connect Zipkin to Elasticsearch
-    depends_on:
-      - elasticsearch
-    networks:
-      - elastic
-
-# Define the network that ELK components will use
-networks:
-  elastic:
-    driver: bridge # Use the default bridge network driver
+      - ES_HOSTS=http://elasticsearch:9200
+    depends_on: [elasticsearch]
+    networks: [elastic]

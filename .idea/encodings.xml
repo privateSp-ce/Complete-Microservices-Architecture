@@ -10,5 +10,13 @@
     <file url="file://$PROJECT_DIR$/payment-service-app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/product-service-app/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/sample-testing/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/api-gateway-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/config-client-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/configserver/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/eureka-server-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/notification-service-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/order-service-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/payment-service-app/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/services/product-service-app/src/main/java" charset="UTF-8" />
   </component>
 </project>
