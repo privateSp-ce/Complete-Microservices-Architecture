@@ -9,38 +9,43 @@ scrape_configs:
     static_configs:
       - targets: ['host.docker.internal:8083']
 
+  - job_name: 'api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:9000' ]
+
   # Product Service
   - job_name: 'product-service'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['host.docker.internal:8081']
-#
-#  # Payment Service
-#  - job_name: 'payment-service'
-#    metrics_path: '/actuator/prometheus'
-#    static_configs:
-#      - targets: ['host.docker.internal:8082']
-#
-#  # Notification Service
-#  - job_name: 'notification-service'
-#    metrics_path: '/actuator/prometheus'
-#    static_configs:
-#      - targets: ['host.docker.internal:8084']
-#
-#  # API Gateway (adjust port if different)
-#  - job_name: 'api-gateway'
-#    metrics_path: '/actuator/prometheus'
-#    static_configs:
-#      - targets: ['host.docker.internal:9000']
-#
-#  # Eureka Server
-#  - job_name: 'eureka-server'
-#    metrics_path: '/actuator/prometheus'
-#    static_configs:
-#      - targets: ['host.docker.internal:8761']
-#
-#  # Config Server
-#  - job_name: 'config-server'
-#    metrics_path: '/actuator/prometheus'
-#    static_configs:
-#      - targets: ['host.docker.internal:8888']
+
+  # Payment Service
+  - job_name: 'payment-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8082']
+
+  # Notification Service
+  - job_name: 'notification-service'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8084']
+
+  # API Gateway (adjust port if different)
+  - job_name: 'api-gateway'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:9000']
+
+  # Eureka Server
+  - job_name: 'eureka-server'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8761']
+
+  # Config Server
+  - job_name: 'config-server'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8888']
