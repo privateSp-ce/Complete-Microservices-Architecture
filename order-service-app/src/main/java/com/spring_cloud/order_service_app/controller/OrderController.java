@@ -42,6 +42,19 @@ public class OrderController {
         }
     }
 
+    @GetMapping("/checking")
+    public String getOrderCheck() {
+        log.info("Came to OrderService1. -> Now going to ProductService");
+//        try {
+//            return productServiceClient.getProductMessage();
+//            //return restTemplate.getForObject("http://PRODUCT-SERVICE-APP/products", String.class);
+//        } catch (Exception e) {
+//            log.error("Failed to retrieve product message", e);
+//            throw e;
+//        }
+        return "checking order service";
+    }
+
     // how to handle if product service is down completely
     //    @GetMapping("/get-order-using-feignClient")
     //    @CircuitBreaker(name = "productservicebreaker", fallbackMethod = "productServiceFailed")
