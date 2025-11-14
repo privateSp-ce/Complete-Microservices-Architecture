@@ -183,3 +183,8 @@ services:
       - ./postgres-init.sh:/docker-entrypoint-initdb.d/postgres-init.sh
     networks:
       - microservices-network
+
+volumes:
+  mongodb_data:
+  redis_data:
+  postgres_data:
