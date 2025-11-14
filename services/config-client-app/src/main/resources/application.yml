@@ -57,7 +57,7 @@ management:  # Actuator endpoints to monitor circuit breaker health
   endpoints:
     web:
       exposure:
-        include: health,info,circuitbreakers,circuitbreakerevents
+        include: health,info,metrics,prometheus,circuitbreakers,circuitbreakerevents
   
   endpoint:
     health:

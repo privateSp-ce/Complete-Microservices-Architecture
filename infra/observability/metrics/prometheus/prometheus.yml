@@ -32,12 +32,6 @@ scrape_configs:
     static_configs:
       - targets: ['host.docker.internal:8084']
 
-  # API Gateway (adjust port if different)
-  - job_name: 'api-gateway'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['host.docker.internal:9000']
-
   # Eureka Server
   - job_name: 'eureka-server'
     metrics_path: '/actuator/prometheus'
