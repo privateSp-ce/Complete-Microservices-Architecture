@@ -2,6 +2,20 @@ spring:
   application:
     name: order-service-app
 
+  # ADD THIS
+  datasource:
+    url: jdbc:postgresql://localhost:5432/orders_db
+    username: foodexpress
+    password: foodexpress123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
   #  {application-name}-{profile}(optional).properties
   # Checks order-service-app.properties in GIT
   config:

@@ -2,6 +2,27 @@ spring:
   application:
     name: payment-service-app
 
+  # ADD THIS
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payments_db
+    username: foodexpress
+    password: foodexpress123
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  # ADD THIS
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
   config:
     import: configserver:http://localhost:8888  # Tell the client where to find the Config Server
 
@@ -89,3 +110,9 @@ management:  # Actuator endpoints to monitor circuit breaker health
     metrics:
       export:
         enabled: true
+
+# ADD THIS AT THE END
+razorpay:
+  key-id: rzp_test_your_key_id  # Get from Razorpay Dashboard
+  key-secret: your_secret_key    # Get from Razorpay Dashboard
+  test-mode: true
