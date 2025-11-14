@@ -5,6 +5,8 @@ name: microservices-infra
 networks:
   elastic:
     driver: bridge
+  microservices-network:
+    driver: bridge
 
 services:
   # =============================
@@ -139,3 +141,45 @@ services:
       - ES_HOSTS=http://elasticsearch:9200
     depends_on: [elasticsearch]
     networks: [elastic]
+
+  # ADD MongoDB
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - microservices-network
+
+  # ADD Redis
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - microservices-network
+
+  # ADD PostgreSQL (for user, restaurant, order, payment, pricing)
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=foodexpress
+      - POSTGRES_PASSWORD=foodexpress123
+      - POSTGRES_MULTIPLE_DATABASES=users_db,restaurants_db,orders_db,payments_db,pricing_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init.sh:/docker-entrypoint-initdb.d/postgres-init.sh
+    networks:
+      - microservices-network

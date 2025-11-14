@@ -13,11 +13,11 @@
         <module name="configserver" />
         <module name="notification-service-app" />
         <module name="product-service-app" />
-        <module name="config-client-app" />
         <module name="eureka-server-app" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="config-client-app" target="21" />
       <module name="sample-testing" target="21" />
     </bytecodeTargetLevel>
   </component>
