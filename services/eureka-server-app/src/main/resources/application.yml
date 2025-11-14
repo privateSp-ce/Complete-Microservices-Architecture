@@ -16,3 +16,12 @@ eureka:
 
   instance:
     prefer-ip-address: true  # Register with IP address instead of hostname
+
+# application.yml (all services)
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans

@@ -36,3 +36,11 @@ eureka:
 #    console: "%d{HH:mm:ss.SSS} %highlight(%-5level) : %msg%n"
 #    # Detailed file pattern with full logger names
 #    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} : %msg%n"
+# application.yml (all services)
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
