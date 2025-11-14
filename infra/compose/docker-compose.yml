@@ -168,23 +168,28 @@ services:
     networks:
       - microservices-network
 
-  # ADD PostgreSQL (for user, restaurant, order, payment, pricing)
-  postgres:
-    image: postgres:16-alpine
-    container_name: postgres
+  # MySQL (for user, restaurant, order, payment, pricing)
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
     ports:
-      - "5432:5432"
+      - "3306:3306"
     environment:
-      - POSTGRES_USER=foodexpress
-      - POSTGRES_PASSWORD=foodexpress123
-      - POSTGRES_MULTIPLE_DATABASES=users_db,restaurants_db,orders_db,payments_db,pricing_db
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: foodexpress
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./postgres-init.sh:/docker-entrypoint-initdb.d/postgres-init.sh
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init.sql:/docker-entrypoint-initdb.d/mysql-init.sql
+    command: --default-authentication-plugin=mysql_native_password
     networks:
       - microservices-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   mongodb_data:
   redis_data:
-  postgres_data:
+  mysql_data:

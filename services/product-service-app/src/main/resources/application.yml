@@ -2,11 +2,12 @@ spring:
   application:
     name: product-service-app
 
-  # ADD THIS
   datasource:
-    url: jdbc:postgresql://localhost:5432/restaurants_db
+    url: jdbc:mysql://localhost:3306/restaurants_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: foodexpress
     password: foodexpress123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,7 +15,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
 
   # ADD THIS (if product service publishes events)
   kafka:

@@ -2,11 +2,12 @@ spring:
   application:
     name: order-service-app
 
-  # ADD THIS
   datasource:
-    url: jdbc:postgresql://localhost:5432/orders_db
+    url: jdbc:mysql://localhost:3306/orders_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: foodexpress
     password: foodexpress123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,7 +15,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        dialect: org.hibernate.dialect.MySQL8Dialect
 
   #  {application-name}-{profile}(optional).properties
   # Checks order-service-app.properties in GIT
