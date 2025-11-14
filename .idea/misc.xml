@@ -21,6 +21,7 @@
         <option value="$PROJECT_DIR$/services/order-service-app/pom.xml" />
         <option value="$PROJECT_DIR$/services/payment-service-app/pom.xml" />
         <option value="$PROJECT_DIR$/services/product-service-app/pom.xml" />
+        <option value="$PROJECT_DIR$/services/user-service-app/pom.xml" />
       </list>
     </option>
   </component>

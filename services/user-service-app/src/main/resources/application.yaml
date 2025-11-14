@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: user-service-app
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/users_db
+    username: foodexpress
+    password: foodexpress123
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  config:
+    import: configserver:http://localhost:8888
+
+  output:
+    ansi:
+      enabled: always
+
+server:
+  port: 8085
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  tracing:
+    sampling:
+      probability: 1.0
+  metrics:
+    tags:
+      application: ${spring.application.name}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+# JWT Configuration
+jwt:
+  secret: yourSecretKeyForJWTwhichShouldBeVeryLongAndSecure1234567890
+  expiration: 86400000  # 24 hours in milliseconds
