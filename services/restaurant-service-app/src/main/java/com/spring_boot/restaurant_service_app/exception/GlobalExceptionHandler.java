@@ -1,8 +1,8 @@
 package com.spring_boot.restaurant_service_app.exception;
 
 
-import com.spring_boot.restaurant_service_app.dto.response.ApiResponse;
-import com.spring_boot.restaurant_service_app.dto.response.ErrorDetail;
+import com.spring_boot.restaurant_service_app.dto.common.ApiResponse;
+import com.spring_boot.restaurant_service_app.dto.common.ErrorDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

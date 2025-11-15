@@ -1,7 +1,7 @@
 package com.spring_boot.restaurant_service_app.controller;
 
 import com.spring_boot.restaurant_service_app.dto.request.MenuCategoryRequest;
-import com.spring_boot.restaurant_service_app.dto.response.ApiResponse;
+import com.spring_boot.restaurant_service_app.dto.common.ApiResponse;
 import com.spring_boot.restaurant_service_app.dto.response.MenuCategoryResponse;
 import com.spring_boot.restaurant_service_app.service.MenuCategoryService;
 import jakarta.validation.Valid;
