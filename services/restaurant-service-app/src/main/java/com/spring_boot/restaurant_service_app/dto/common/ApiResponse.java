@@ -1,4 +1,4 @@
-package com.spring_boot.restaurant_service_app.dto.response;
+package com.spring_boot.restaurant_service_app.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

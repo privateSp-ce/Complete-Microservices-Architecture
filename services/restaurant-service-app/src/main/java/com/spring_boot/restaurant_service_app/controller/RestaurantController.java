@@ -4,7 +4,7 @@ import com.spring_boot.restaurant_service_app.dto.common.PageResponse;
 import com.spring_boot.restaurant_service_app.dto.request.RestaurantRegistrationRequest;
 import com.spring_boot.restaurant_service_app.dto.request.RestaurantSearchRequest;
 import com.spring_boot.restaurant_service_app.dto.request.RestaurantUpdateRequest;
-import com.spring_boot.restaurant_service_app.dto.response.ApiResponse;
+import com.spring_boot.restaurant_service_app.dto.common.ApiResponse;
 import com.spring_boot.restaurant_service_app.dto.response.RestaurantResponse;
 import com.spring_boot.restaurant_service_app.dto.response.RestaurantSummaryResponse;
 import com.spring_boot.restaurant_service_app.service.RestaurantService;
