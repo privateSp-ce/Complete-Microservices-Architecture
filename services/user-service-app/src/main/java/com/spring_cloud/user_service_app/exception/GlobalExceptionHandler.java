@@ -5,6 +5,7 @@ import com.spring_cloud.user_service_app.dto.ErrorDetail;
 import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,6 +28,11 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     private final Tracer tracer;
+
+    // Constructor with Optional Tracer
+    public GlobalExceptionHandler(@Autowired(required = false) Tracer tracer) {
+        this.tracer = tracer;
+    }
 
     /**
      * Get current trace ID for distributed tracing
