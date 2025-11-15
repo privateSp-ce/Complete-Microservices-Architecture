@@ -1,26 +1,50 @@
 package com.spring_boot.restaurant_service_app.dto.response;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
+/**
+ * Represents a single error detail (used for validation errors)
+ */
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class ErrorDetail {
-    private String message;
-    private String error;
-    private int status;
-    private String path;
-    private List<String> details;
 
-    @Builder.Default
-    private LocalDateTime timestamp = LocalDateTime.now();
+    /**
+     * Field name where error occurred (e.g., "email", "name")
+     */
+    private String field;
+
+    /**
+     * Error message for this field
+     */
+    private String message;
+
+    /**
+     * Rejected value (optional, for debugging)
+     */
+    private Object rejectedValue;
+
+    /**
+     * Error code (optional, for internationalization)
+     */
+    private String code;
+
+    // ============================================
+    // Convenience Constructors
+    // ============================================
+
+    public ErrorDetail(String field, String message) {
+        this.field = field;
+        this.message = message;
+    }
+
+    public ErrorDetail(String field, String message, Object rejectedValue) {
+        this.field = field;
+        this.message = message;
+        this.rejectedValue = rejectedValue;
+    }
 }
