@@ -29,6 +29,10 @@ public class MenuCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Add this new field
+    @Column(name = "restaurant_id", nullable = false, insertable = false, updatable = false)
+    private Long restaurantId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
     @JsonIgnore
