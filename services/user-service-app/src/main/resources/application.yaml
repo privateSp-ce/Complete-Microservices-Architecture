@@ -18,7 +18,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
   config:
-    import: configserver:http://localhost:8888
+    import: optional:configserver:http://localhost:8888
 
   output:
     ansi:
