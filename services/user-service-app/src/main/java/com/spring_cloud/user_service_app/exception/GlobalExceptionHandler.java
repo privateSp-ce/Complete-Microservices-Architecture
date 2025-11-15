@@ -3,7 +3,6 @@ package com.spring_cloud.user_service_app.exception;
 import com.spring_cloud.user_service_app.dto.ApiResponse;
 import com.spring_cloud.user_service_app.dto.ErrorDetail;
 import io.micrometer.tracing.Tracer;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,12 +23,11 @@ import java.util.stream.Collectors;
  */
 @RestControllerAdvice
 @Slf4j
-@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
     private final Tracer tracer;
 
-    // Constructor with Optional Tracer
+    // Constructor with Optional Tracer (REMOVED @RequiredArgsConstructor)
     public GlobalExceptionHandler(@Autowired(required = false) Tracer tracer) {
         this.tracer = tracer;
     }
