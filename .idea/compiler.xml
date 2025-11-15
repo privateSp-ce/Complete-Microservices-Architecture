@@ -9,10 +9,10 @@
         <outputRelativeToContentRoot value="true" />
         <module name="order-service-app" />
         <module name="payment-service-app" />
+        <module name="restaurant-service-app" />
         <module name="api-gateway-app" />
         <module name="configserver" />
         <module name="notification-service-app" />
-        <module name="product-service-app" />
         <module name="eureka-server-app" />
       </profile>
       <profile name="Annotation profile for user-service-app" enabled="true">
@@ -27,6 +27,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="config-client-app" target="21" />
+      <module name="product-service-app" target="21" />
       <module name="sample-testing" target="21" />
     </bytecodeTargetLevel>
   </component>
@@ -40,6 +41,7 @@
       <module name="order-service-app" options="-parameters" />
       <module name="payment-service-app" options="-parameters" />
       <module name="product-service-app" options="-parameters" />
+      <module name="restaurant-service-app" options="-parameters" />
       <module name="sample-testing" options="-parameters" />
       <module name="user-service-app" options="-parameters" />
     </option>

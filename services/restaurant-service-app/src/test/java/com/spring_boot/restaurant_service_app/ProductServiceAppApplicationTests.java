@@ -1,4 +1,4 @@
-package com.spring_boot.product_service_app;
+package com.spring_boot.restaurant_service_app;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

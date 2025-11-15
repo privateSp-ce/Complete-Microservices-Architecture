@@ -1,6 +1,6 @@
 spring:
   application:
-    name: product-service-app
+    name: restaurant-service-app
 
   datasource:
     url: jdbc:mysql://localhost:3306/restaurants_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC

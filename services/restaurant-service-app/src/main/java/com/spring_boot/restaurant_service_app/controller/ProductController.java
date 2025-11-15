@@ -1,6 +1,6 @@
-package com.spring_boot.product_service_app.controller;
+package com.spring_boot.restaurant_service_app.controller;
 
-import com.spring_boot.product_service_app.dto.ProductDTO;
+import com.spring_boot.restaurant_service_app.dto.ProductDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

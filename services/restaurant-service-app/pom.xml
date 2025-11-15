@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.spring_boot</groupId>
-	<artifactId>product-service-app</artifactId>
+	<artifactId>restaurant-service-app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>product-service-app</name>
-	<description>Product Microservice</description>
+	<name>restaurant-service-app</name>
+	<description>Restaurant and Menu Management Service</description>
 	<url/>
 	<licenses>
 		<license/>

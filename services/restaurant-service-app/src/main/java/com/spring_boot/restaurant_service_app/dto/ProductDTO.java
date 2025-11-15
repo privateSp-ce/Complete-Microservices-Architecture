@@ -1,4 +1,4 @@
-package com.spring_boot.product_service_app.dto;
+package com.spring_boot.restaurant_service_app.dto;
 
 import lombok.*;
 

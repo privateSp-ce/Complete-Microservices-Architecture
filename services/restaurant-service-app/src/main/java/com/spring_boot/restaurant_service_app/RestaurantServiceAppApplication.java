@@ -1,11 +1,11 @@
-package com.spring_boot.product_service_app;
+package com.spring_boot.restaurant_service_app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ProductServiceAppApplication {
+public class RestaurantServiceAppApplication {
 	public static void main(String[] args) {
-        SpringApplication.run(ProductServiceAppApplication.class, args);
+        SpringApplication.run(RestaurantServiceAppApplication.class, args);
 	}
 }
