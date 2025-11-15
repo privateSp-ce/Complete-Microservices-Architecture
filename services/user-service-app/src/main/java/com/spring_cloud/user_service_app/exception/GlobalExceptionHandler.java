@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
 
     private final Tracer tracer;
 
-    // Constructor with Optional Tracer (REMOVED @RequiredArgsConstructor)
+    // Constructor with Optional Tracer
     public GlobalExceptionHandler(@Autowired(required = false) Tracer tracer) {
         this.tracer = tracer;
     }
