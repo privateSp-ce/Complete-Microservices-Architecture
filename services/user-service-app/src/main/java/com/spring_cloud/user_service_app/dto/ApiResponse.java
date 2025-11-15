@@ -82,12 +82,26 @@ public class ApiResponse<T> {
 
     /**
      * Create a success response without data (for operations like delete)
+     * FIXED: Explicit Void type parameter
      */
-    public static <T> ApiResponse<T> success(String message) {
-        return ApiResponse.<T>builder()
+    public static ApiResponse<Void> success(String message) {
+        return ApiResponse.<Void>builder()
                 .success(true)
                 .message(message)
                 .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    /**
+     * Create a success response without data with traceId
+     * FIXED: Explicit Void type parameter
+     */
+    public static ApiResponse<Void> success(String message, String traceId) {
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .traceId(traceId)
                 .build();
     }
 

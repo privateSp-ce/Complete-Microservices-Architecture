@@ -7,8 +7,8 @@ import com.spring_cloud.user_service_app.dto.response.AddressResponse;
 import com.spring_cloud.user_service_app.service.AddressService;
 import io.micrometer.tracing.Tracer;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,12 +21,18 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/users/me/addresses")
-@RequiredArgsConstructor
 @Slf4j
 public class AddressController {
 
     private final AddressService addressService;
     private final Tracer tracer;
+
+    // Manual constructor with Optional Tracer
+    public AddressController(AddressService addressService,
+                             @Autowired(required = false) Tracer tracer) {
+        this.addressService = addressService;
+        this.tracer = tracer;
+    }
 
     /**
      * Get current trace ID
