@@ -1,6 +1,6 @@
 package com.spring_boot.restaurant_service_app.controller;
 
-import com.spring_boot.restaurant_service_app.dto.ProductDTO;
+import com.spring_boot.restaurant_service_app.dto.RestaurantDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-public class ProductController {
+public class RestaurantController {
 
     @GetMapping("/products")
     public String getMessage() {
@@ -29,7 +29,7 @@ public class ProductController {
     //    }
 
     @PostMapping("/post-msg-using-feign")
-    public String postMsg(@RequestBody ProductDTO data) {
+    public String postMsg(@RequestBody RestaurantDTO data) {
         return "Product Created Successfully " + data.toString();
     }
 
