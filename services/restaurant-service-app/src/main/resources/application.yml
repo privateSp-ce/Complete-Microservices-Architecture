@@ -1,12 +1,39 @@
+# ============================================
+# 1. CORE APPLICATION & SERVER CONFIGURATION
+# ============================================
+server:
+  port: 8081
+
 spring:
   application:
     name: restaurant-service-app
+  
+  # Spring Cloud Config Client
+  config:
+    import: configserver:http://localhost:8888  # Tell the client where to find the Config Server
+  
+  # Console output formatting
+  output:
+    ansi:
+      enabled: always
 
+# ============================================
+# 2. DATABASE & PERSISTENCE (JPA, HIBERNATE)
+# ============================================
+spring:
   datasource:
     url: jdbc:mysql://localhost:3306/restaurants_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: foodexpress
     password: foodexpress123
     driver-class-name: com.mysql.cj.jdbc.Driver
+
+    # Connection Pool Settings (HikariCP)
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
 
   jpa:
     hibernate:
@@ -15,43 +42,46 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        use_sql_comments: true
         dialect: org.hibernate.dialect.MySQL8Dialect
+        # Performance optimizations
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        # Second-level cache (optional)
+        cache:
+          use_second_level_cache: false
 
-  # ADD THIS (if product service publishes events)
+# ============================================
+# 3. MESSAGING SYSTEMS (KAFKA & RABBITMQ)
+# ============================================
+spring:
+  # Publishing events (if needed)
   kafka:
     producer:
       bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-  config:
-    import: configserver:http://localhost:8888  # Tell the client where to find the Config Server
-
-  rabbitmq:  # RabbitMQ connection details - Listening message from RabbitMq
+  # Listening for events (if needed)
+  rabbitmq:
     host: localhost
     username: admin
     password: admin
 
-  output:
-    ansi:
-      enabled: always
-
-server:
-  port: 8081
-
+# ============================================
+# 4. SERVICE DISCOVERY (EUREKA)
+# ============================================
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/  # Eureka Server ekkada undo cheppadaniki
-
   instance:
     prefer-ip-address: true  # Register with IP address instead of hostname
 
-
 # ============================================
-# Resilience4j Circuit Breaker Configuration
+# 5. RESILIENCE (RESILIENCE4J)
 # ============================================
-
 resilience4j:
   circuitbreaker:
     instances:
@@ -65,50 +95,86 @@ resilience4j:
         failureRateThreshold: 50
         eventConsumerBufferSize: 10
         slidingWindowType: COUNT_BASED
-        recordExceptions:  # Record specific exceptions that should be counted as failures
+        recordExceptions:
           - org.springframework.web.client.ResourceAccessException
           - java.net.ConnectException
           - java.io.IOException
 
-  timelimiter:  # Time Limiter Configuration (Optional - adds timeout protection)
+  timelimiter:
     instances:
       productServiceBreaker:
         timeoutDuration: 5s
         cancelRunningFuture: true
 
-management:  # Actuator endpoints to monitor circuit breaker health
+# ============================================
+# 6. OBSERVABILITY (ACTUATOR, TRACING, METRICS)
+# ============================================
+management:
+  # Base path for all actuator endpoints
   endpoints:
     web:
       exposure:
-        include: health,info,circuitbreakers,circuitbreakerevents, prometheus,metrics
+        include: health,info,circuitbreakers,circuitbreakerevents,prometheus,metrics
+      base-path: /actuator
 
+  # Health Check Configuration
   endpoint:
     health:
-      show-details: always
+      show-details: when-authorized # 'always' is ok for dev, 'when-authorized' is better for prod
+      show-components: always
 
   health:
     circuitbreakers:
       enabled: true
+    db:
+      enabled: true
+    diskspace:
+      enabled: true
 
-  # ----------------------------------------------------
-  # DISTRIBUTED TRACING (ZIPKIN) CONFIGURATION
-  # ----------------------------------------------------
+  # Distributed Tracing (Zipkin)
   zipkin:
     tracing:
-      # Mana Zipkin dashboard address
-      endpoint: http://localhost:9411/api/v2/spans
+      endpoint: http://localhost:9411/api/v2/spans # Mana Zipkin dashboard address
   tracing:
-    # Ee service nunchi vache prathi request ni trace cheyyadaniki
     sampling:
       probability: 1.0 # 1.0 ante 100% of requests ni trace cheyyi ani ardam
 
+  # Metrics (Prometheus)
   metrics:
+    export:
+      prometheus:
+        enabled: true
     tags:
       application: ${spring.application.name}  # Tag all metrics with service name
     distribution:
       percentiles-histogram:
         http.server.requests: true  # Generate histograms for request duration
-  prometheus:
-    metrics:
-      export:
-        enabled: true
+
+# ============================================
+# 7. SPRINGDOC OPENAPI (SWAGGER)
+# ============================================
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+    display-request-duration: true
+    doc-expansion: none
+  
+  show-actuator: true
+  
+  # Package to scan for REST controllers
+  packages-to-scan: com.spring_boot.restaurant_service_app.controller
+
+# ============================================
+# 8. APPLICATION-SPECIFIC PROPERTIES
+# ============================================
+app:
+  name: Restaurant Service
+  version: 1.0.0
+  description: Microservice for managing restaurants, menu categories, and menu items.
