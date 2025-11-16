@@ -4,6 +4,8 @@ import com.spring_boot.restaurant_service_app.dto.request.MenuCategoryRequest;
 import com.spring_boot.restaurant_service_app.dto.response.MenuCategoryResponse;
 import com.spring_boot.restaurant_service_app.entity.MenuCategory;
 import com.spring_boot.restaurant_service_app.entity.Restaurant;
+import com.spring_boot.restaurant_service_app.exception.DuplicateResourceException;
+import com.spring_boot.restaurant_service_app.exception.ResourceNotFoundException;
 import com.spring_boot.restaurant_service_app.repository.MenuCategoryRepository;
 import com.spring_boot.restaurant_service_app.repository.MenuItemRepository;
 import com.spring_boot.restaurant_service_app.repository.RestaurantRepository;
@@ -32,11 +34,11 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
 
         // Verify restaurant exists
         Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(restaurantId)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with ID: " + restaurantId));
 
         // Check if category name already exists for this restaurant
         if (menuCategoryRepository.existsByNameAndRestaurantId(request.getName(), restaurantId)) {
-            throw new RuntimeException("Category with name '" + request.getName() + "' already exists for this restaurant");
+            throw new DuplicateResourceException("Category with name '" + request.getName() + "' already exists for this restaurant");
         }
 
         // Create category
@@ -60,7 +62,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         log.info("Fetching category ID: {} for restaurant ID: {}", categoryId, restaurantId);
 
         MenuCategory category = menuCategoryRepository.findByIdAndRestaurantId(categoryId, restaurantId)
-                .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + categoryId));
 
         return mapToCategoryResponse(category);
     }
@@ -70,12 +72,12 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         log.info("Updating category ID: {} for restaurant ID: {}", categoryId, restaurantId);
 
         MenuCategory category = menuCategoryRepository.findByIdAndRestaurantId(categoryId, restaurantId)
-                .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + categoryId));
 
         // Check if new name conflicts with existing category
         if (request.getName() != null && !request.getName().equals(category.getName())) {
             if (menuCategoryRepository.existsByNameAndRestaurantId(request.getName(), restaurantId)) {
-                throw new RuntimeException("Category with name '" + request.getName() + "' already exists for this restaurant");
+                throw new DuplicateResourceException("Category with name '" + request.getName() + "' already exists for this restaurant");
             }
             category.setName(request.getName());
         }
@@ -101,7 +103,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         log.info("Deleting category ID: {} for restaurant ID: {}", categoryId, restaurantId);
 
         MenuCategory category = menuCategoryRepository.findByIdAndRestaurantId(categoryId, restaurantId)
-                .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + categoryId));
 
         menuCategoryRepository.delete(category);
         log.info("Category deleted successfully with ID: {}", categoryId);
@@ -136,7 +138,7 @@ public class MenuCategoryServiceImpl implements MenuCategoryService {
         for (int i = 0; i < categoryIds.size(); i++) {
             Long categoryId = categoryIds.get(i);
             MenuCategory category = menuCategoryRepository.findByIdAndRestaurantId(categoryId, restaurantId)
-                    .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + categoryId));
             category.setDisplayOrder(i);
             menuCategoryRepository.save(category);
         }

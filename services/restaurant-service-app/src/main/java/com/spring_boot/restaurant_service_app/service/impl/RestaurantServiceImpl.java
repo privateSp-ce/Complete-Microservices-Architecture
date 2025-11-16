@@ -9,6 +9,8 @@ import com.spring_boot.restaurant_service_app.dto.request.RestaurantUpdateReques
 import com.spring_boot.restaurant_service_app.dto.response.RestaurantResponse;
 import com.spring_boot.restaurant_service_app.dto.response.RestaurantSummaryResponse;
 import com.spring_boot.restaurant_service_app.entity.Restaurant;
+import com.spring_boot.restaurant_service_app.exception.DuplicateResourceException;
+import com.spring_boot.restaurant_service_app.exception.ResourceNotFoundException;
 import com.spring_boot.restaurant_service_app.repository.RestaurantRepository;
 import com.spring_boot.restaurant_service_app.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +39,7 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         // Check if owner already has a restaurant
         if (restaurantRepository.existsByOwnerUserId(request.getOwnerUserId())) {
-            throw new RuntimeException("Owner already has a registered restaurant");
+            throw new DuplicateResourceException("Owner already has a registered restaurant");
         }
 
         // Build full address
@@ -87,7 +89,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     public RestaurantResponse getRestaurantById(Long id) {
         log.info("Fetching restaurant with ID: {}", id);
         Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with ID: " + id));
         return mapToRestaurantResponse(restaurant);
     }
 
@@ -96,7 +98,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         log.info("Updating restaurant with ID: {}", id);
 
         Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with ID: " + id));
 
         // Update fields if provided
         if (request.getName() != null) {
@@ -164,7 +166,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         log.info("Deleting restaurant with ID: {}", id);
 
         Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with ID: " + id));
 
         restaurant.setIsActive(false);
         restaurant.setIsAcceptingOrders(false);
@@ -268,7 +270,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         log.info("Verifying restaurant with ID: {}", id);
 
         Restaurant restaurant = restaurantRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with ID: " + id));
 
         restaurant.setIsVerified(true);
         restaurant.setIsAcceptingOrders(true);
@@ -283,7 +285,7 @@ public class RestaurantServiceImpl implements RestaurantService {
         log.info("Toggling accepting orders for restaurant ID: {}", id);
 
         Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(id)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with ID: " + id));
 
         restaurant.setIsAcceptingOrders(!restaurant.getIsAcceptingOrders());
         Restaurant updatedRestaurant = restaurantRepository.save(restaurant);

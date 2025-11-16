@@ -7,6 +7,8 @@ import com.spring_boot.restaurant_service_app.entity.MenuCategory;
 import com.spring_boot.restaurant_service_app.entity.MenuItem;
 import com.spring_boot.restaurant_service_app.entity.Restaurant;
 import com.spring_boot.restaurant_service_app.entity.enums.DietaryType;
+import com.spring_boot.restaurant_service_app.exception.DuplicateResourceException;
+import com.spring_boot.restaurant_service_app.exception.ResourceNotFoundException;
 import com.spring_boot.restaurant_service_app.repository.MenuCategoryRepository;
 import com.spring_boot.restaurant_service_app.repository.MenuItemRepository;
 import com.spring_boot.restaurant_service_app.repository.RestaurantRepository;
@@ -36,11 +38,11 @@ public class MenuItemServiceImpl implements MenuItemService {
 
         // Verify restaurant exists
         Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(restaurantId)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with ID: " + restaurantId));
 
         // Verify category exists and belongs to this restaurant
         MenuCategory category = menuCategoryRepository.findByIdAndRestaurantId(request.getCategoryId(), restaurantId)
-                .orElseThrow(() -> new RuntimeException("Category not found with ID: " + request.getCategoryId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + request.getCategoryId()));
 
         // Check if item name already exists
         if (menuItemRepository.existsByNameAndRestaurantId(request.getName(), restaurantId)) {
@@ -79,7 +81,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         log.info("Fetching menu item ID: {} for restaurant ID: {}", itemId, restaurantId);
 
         MenuItem menuItem = menuItemRepository.findByIdAndRestaurantId(itemId, restaurantId)
-                .orElseThrow(() -> new RuntimeException("Menu item not found with ID: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu item not found with ID: " + itemId));
 
         return mapToMenuItemResponse(menuItem);
     }
@@ -89,19 +91,19 @@ public class MenuItemServiceImpl implements MenuItemService {
         log.info("Updating menu item ID: {} for restaurant ID: {}", itemId, restaurantId);
 
         MenuItem menuItem = menuItemRepository.findByIdAndRestaurantId(itemId, restaurantId)
-                .orElseThrow(() -> new RuntimeException("Menu item not found with ID: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu item not found with ID: " + itemId));
 
         // Update category if provided
         if (request.getCategoryId() != null && !request.getCategoryId().equals(menuItem.getCategoryId())) {
             MenuCategory category = menuCategoryRepository.findByIdAndRestaurantId(request.getCategoryId(), restaurantId)
-                    .orElseThrow(() -> new RuntimeException("Category not found with ID: " + request.getCategoryId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + request.getCategoryId()));
             menuItem.setCategory(category);
         }
 
         // Check if new name conflicts
         if (request.getName() != null && !request.getName().equals(menuItem.getName())) {
             if (menuItemRepository.existsByNameAndRestaurantId(request.getName(), restaurantId)) {
-                throw new RuntimeException("Menu item with name '" + request.getName() + "' already exists");
+                throw new DuplicateResourceException("Menu item with name '" + request.getName() + "' already exists");
             }
             menuItem.setName(request.getName());
         }
@@ -157,7 +159,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         log.info("Deleting menu item ID: {} for restaurant ID: {}", itemId, restaurantId);
 
         MenuItem menuItem = menuItemRepository.findByIdAndRestaurantId(itemId, restaurantId)
-                .orElseThrow(() -> new RuntimeException("Menu item not found with ID: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu item not found with ID: " + itemId));
 
         menuItemRepository.delete(menuItem);
         log.info("Menu item deleted successfully with ID: {}", itemId);
@@ -191,7 +193,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         log.info("Fetching full menu for restaurant ID: {}", restaurantId);
 
         Restaurant restaurant = restaurantRepository.findByIdAndIsActiveTrue(restaurantId)
-                .orElseThrow(() -> new RuntimeException("Restaurant not found with ID: " + restaurantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with ID: " + restaurantId));
 
         List<MenuCategory> categories = menuCategoryRepository.findByRestaurantIdAndIsActiveTrueOrderByDisplayOrderAsc(restaurantId);
 
@@ -279,7 +281,7 @@ public class MenuItemServiceImpl implements MenuItemService {
         log.info("Toggling availability for menu item ID: {} in restaurant ID: {}", itemId, restaurantId);
 
         MenuItem menuItem = menuItemRepository.findByIdAndRestaurantId(itemId, restaurantId)
-                .orElseThrow(() -> new RuntimeException("Menu item not found with ID: " + itemId));
+                .orElseThrow(() -> new ResourceNotFoundException("Menu item not found with ID: " + itemId));
 
         menuItem.setIsAvailable(!menuItem.getIsAvailable());
         MenuItem updatedItem = menuItemRepository.save(menuItem);
