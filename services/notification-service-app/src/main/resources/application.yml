@@ -2,6 +2,9 @@ spring:
   application:
     name: notification-service-app # Eureka lo ee peru tho register avuthundi
 
+  config:
+    import: optional:configserver:http://localhost:8888
+
   # ----------------------------------------------------
   # 1. KAFKA CONFIGURATION (The Post Box 📮 Address)
   # ----------------------------------------------------
