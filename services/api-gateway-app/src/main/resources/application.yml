@@ -1,107 +1,149 @@
 spring:
   application:
-    name: api-gateway-app  # 1. Give the gateway a name
+    name: api-gateway-app
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:  # 4. Define the routing rule for product-service
-            - id: product_route
-              # uses lb to find services registered in EUREKA
-              uri: lb://PRODUCT-SERVICE-APP
-              predicates:
-                - Path=/products/**
-              # ❌ NOT NEEDED if your ProductController already has /products
-              filters:
-                - RewritePath=/products/(?<segment>.*), /$\{segment}
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        # ===================================
+        # USER SERVICE ROUTES
+        # ===================================
+        - id: user-service-auth
+          uri: lb://USER-SERVICE-APP
+          predicates:
+            - Path=/api/v1/auth/**
 
-            # Rule 2: Order Service (Manam ippudu add cheyyalsindi)
-            - id: order_route       # Ee rule ki oka peru (e.g., order_route)
-              uri: lb://ORDER-SERVICE-APP   # order-service-app ye peru tho register aindi?
-              predicates:
-                - Path=/orders/**   # OrderController lo manam ye path create chesam?
-              # ❌ NOT NEEDED if your OrderController already has /orders
-              filters:
-                - RewritePath=/orders/(?<segment>.*), /$\{segment}
+        - id: user-service-users
+          uri: lb://USER-SERVICE-APP
+          predicates:
+            - Path=/api/v1/users/**
 
-            # ⭐ CRITICAL: Ee route OpenAPI docs kosam add cheyali
-            - id: openapi-product
-              uri: lb://PRODUCT-SERVICE-APP
-              predicates:
-                - Path=/products/v3/api-docs
-              filters:
-                - RewritePath=/products/v3/api-docs(?<segment>.*), /v3/api-docs$\{segment}
+        # ===================================
+        # RESTAURANT SERVICE ROUTES
+        # ===================================
+        - id: restaurant-service
+          uri: lb://RESTAURANT-SERVICE-APP
+          predicates:
+            - Path=/api/v1/restaurants/**
 
-            - id: openapi-order
-              uri: lb://ORDER-SERVICE-APP
-              predicates:
-                - Path=/orders/v3/api-docs
-              filters:
-                - RewritePath=/orders/v3/api-docs(?<segment>.*), /v3/api-docs$\{segment}
+        # ===================================
+        # CART SERVICE ROUTES
+        # ===================================
+        - id: cart-service
+          uri: lb://CART-SERVICE-APP
+          predicates:
+            - Path=/api/v1/cart/**
+
+        # ===================================
+        # ORDER SERVICE ROUTES
+        # ===================================
+        - id: order-service
+          uri: lb://ORDER-SERVICE-APP
+          predicates:
+            - Path=/api/v1/orders/**
+
+        # ===================================
+        # PAYMENT SERVICE ROUTES
+        # ===================================
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE-APP
+          predicates:
+            - Path=/api/v1/payments/**
+
+        # ===================================
+        # OPENAPI DOCS ROUTES
+        # ===================================
+        - id: openapi-user
+          uri: lb://USER-SERVICE-APP
+          predicates:
+            - Path=/user-service/v3/api-docs
+          filters:
+            - RewritePath=/user-service/v3/api-docs, /v3/api-docs
+
+        - id: openapi-restaurant
+          uri: lb://RESTAURANT-SERVICE-APP
+          predicates:
+            - Path=/restaurant-service/v3/api-docs
+          filters:
+            - RewritePath=/restaurant-service/v3/api-docs, /v3/api-docs
+
+        - id: openapi-cart
+          uri: lb://CART-SERVICE-APP
+          predicates:
+            - Path=/cart-service/v3/api-docs
+          filters:
+            - RewritePath=/cart-service/v3/api-docs, /v3/api-docs
+
+        - id: openapi-order
+          uri: lb://ORDER-SERVICE-APP
+          predicates:
+            - Path=/order-service/v3/api-docs
+          filters:
+            - RewritePath=/order-service/v3/api-docs, /v3/api-docs
+
+        - id: openapi-payment
+          uri: lb://PAYMENT-SERVICE-APP
+          predicates:
+            - Path=/payment-service/v3/api-docs
+          filters:
+            - RewritePath=/payment-service/v3/api-docs, /v3/api-docs
 
 server:
-  port: 9000  # 2. Set a unique port for it
+  port: 9000
 
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/  # 3. Tell it where the Eureka server is
-  
+      defaultZone: http://localhost:8761/eureka/
   instance:
-    prefer-ip-address: true  # Register with IP address instead of hostname
+    prefer-ip-address: true
 
-# ----------------------------------------------------
-# DISTRIBUTED TRACING (ZIPKIN) CONFIGURATION
-# ----------------------------------------------------
 management:
   zipkin:
     tracing:
-      # Mana Zipkin dashboard address
       endpoint: http://localhost:9411/api/v2/spans
   tracing:
-    # Ee service nunchi vache prathi request ni trace cheyyadaniki
     enabled: true
     sampling:
-      probability: 1.0 # 1.0 ante 100% of requests ni trace cheyyi ani ardam
-
-  # ----------------------------------------------------
-  # THE FIX: Add this block to "turn on" the endpoints
-  # ----------------------------------------------------
+      probability: 1.0
   endpoints:
     web:
       exposure:
-        # "*" anedi, anni management endpoints ni (Zipkin tho saha) expose chesthundi
         include: health,info,metrics,prometheus
-
   endpoint:
     health:
       show-details: always
     prometheus:
       access: read_only
-
   metrics:
     tags:
-      application: ${spring.application.name}  # Tag all metrics with service name
+      application: ${spring.application.name}
     distribution:
       percentiles-histogram:
-        http.server.requests: true  # Generate histograms for request duration
+        http.server.requests: true
   prometheus:
     metrics:
       export:
         enabled: true
 
-# ⭐⭐⭐ MOST IMPORTANT: Ee configuration add cheyali
-# ⭐⭐⭐ Springdoc configuration
-# ⭐⭐⭐ Expose only those which are needed. In this way we can protect our important endpoints
 springdoc:
   swagger-ui:
     urls-primary-name: API Documentation
     enabled: true
     urls:
-      - name: Product Service
-        url: /products/v3/api-docs
+      - name: User Service
+        url: /user-service/v3/api-docs
+      - name: Restaurant Service
+        url: /restaurant-service/v3/api-docs
+      - name: Cart Service
+        url: /cart-service/v3/api-docs
       - name: Order Service
-        url: /orders/v3/api-docs
+        url: /order-service/v3/api-docs
+      - name: Payment Service
+        url: /payment-service/v3/api-docs
 
 logging:
   pattern:
