@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
-import { TrashIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 const Cart = () => {
@@ -71,6 +70,27 @@ const Cart = () => {
       </div>
     );
   }
+
+    const handleCheckout = async () => {
+        try {
+            // 1. Create Order
+            const orderResponse = await api.post('/orders/place', {
+                paymentMethod: "UPI", // Hardcode for now
+                deliveryAddress: "Flat 402, Tech Park, Hyderabad"
+            });
+
+            toast.success("Order Placed Successfully! 🎉");
+
+            // 2. Redirect to Order Success Page (Create a simple page later)
+            // navigate('/orders/' + orderResponse.data.data.orderTrackingNumber);
+
+            // 3. Clear local cart state
+            setCart(null);
+
+        } catch (error) {
+            toast.error("Order Failed: " + error.message);
+        }
+    };
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -172,7 +192,7 @@ const Cart = () => {
 
              <button
                 className="w-full bg-green-600 text-white font-bold py-3 rounded-lg shadow-lg hover:bg-green-700 transition"
-                onClick={() => toast('Order functionality coming in Phase 3!')}
+                onClick={() => handleCheckout()}
              >
                  PROCEED TO PAY
              </button>

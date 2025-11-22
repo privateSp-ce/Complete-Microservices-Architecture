@@ -15,10 +15,10 @@ import java.math.BigDecimal;
 public class AddToCartRequest {
 
     @NotNull(message = "Restaurant ID is required")
-    private Long restaurantId;
+    private String restaurantId;
 
     @NotNull(message = "Menu item ID is required")
-    private Long menuItemId;
+    private String menuItemId;
 
     @NotBlank(message = "Item name is required")
     @Size(max = 255, message = "Item name must not exceed 255 characters")

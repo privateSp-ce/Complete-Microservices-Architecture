@@ -1,4 +1,4 @@
-package com.foodexpress.cart.dto.response;
+package com.foodexpress.order.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Builder
 public class CartItem implements Serializable {
 
-    private String itemId; // Using MenuItem ID (String from Mongo)
+    private String menuItemId; // Using MenuItem ID (String from Mongo)
     private String itemName;
     private BigDecimal price;
     private Integer quantity;
