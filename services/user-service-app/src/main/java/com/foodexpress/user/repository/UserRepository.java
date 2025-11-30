@@ -47,9 +47,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     Optional<User> findByIdAndIsActiveTrue(Long id);
 
-    /**
-     * Custom query to fetch user with addresses
-     */
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.addresses WHERE u.id = :userId AND u.isActive = true")
-    Optional<User> findByIdWithAddresses(@Param("userId") Long userId);
+    // Removed @Query with JOIN FETCH addresses because the relationship was removed/refactored.
+    // Address management is now handled via AddressRepository using userId.
 }

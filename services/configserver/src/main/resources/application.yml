@@ -2,11 +2,14 @@ spring:
   application:
     name: configserver
 
+  profiles:
+    active: native
+
   cloud:
     config:
       server:
-        git:
-          uri: https://github.com/pdheeraj99/spring-config-repo.git  # The location of the Git repository
+        native:
+          search-locations: classpath:/config
 
   rabbitmq:  # RabbitMQ connection details - Publishing message to RabbitMq
     host: localhost

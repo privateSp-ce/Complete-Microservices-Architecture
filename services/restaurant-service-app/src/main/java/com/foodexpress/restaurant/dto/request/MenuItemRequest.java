@@ -31,7 +31,7 @@ public class MenuItemRequest {
     private BigDecimal discountedPrice;
 
     @NotNull(message = "Category ID is required")
-    private Long categoryId;
+    private String categoryId;
 
     @NotNull(message = "Dietary type is required")
     private DietaryType dietaryType;

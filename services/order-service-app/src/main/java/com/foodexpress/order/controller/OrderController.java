@@ -16,9 +16,17 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController {
 
     private final OrderService orderService;
+    private final com.foodexpress.order.service.OrderStateMachineService orderStateMachineService;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, com.foodexpress.order.service.OrderStateMachineService orderStateMachineService) {
         this.orderService = orderService;
+        this.orderStateMachineService = orderStateMachineService;
+    }
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestParam com.foodexpress.order.enums.OrderStatus status) {
+        orderStateMachineService.updateStatus(id, status);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/place")

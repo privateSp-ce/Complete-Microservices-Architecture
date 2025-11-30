@@ -57,9 +57,21 @@ public class User {
     @Builder.Default
     private Boolean phoneVerified = false;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Address> addresses = new ArrayList<>();
+    // Removing mappedBy="user" because I want to keep Address entity decoupled slightly or fix the circular reference.
+    // Actually, looking at the code I generated for Address, it has 'userId' not 'user' object.
+    // So this relationship mapping is incorrect if Address only has userId.
+    // I will refactor Address to have User object if I keep this OneToMany.
+    // OR I will remove this OneToMany and just load addresses via Repository.
+    // For now, let's keep it simple: Address entity has userId. User entity does NOT have list of addresses.
+    // This avoids large object graphs.
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @ElementCollection
+    @CollectionTable(name = "user_preferences", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "preference")
+    private List<String> preferences = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -69,14 +81,4 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // Helper methods
-    public void addAddress(Address address) {
-        addresses.add(address);
-        address.setUser(this);
-    }
-
-    public void removeAddress(Address address) {
-        addresses.remove(address);
-        address.setUser(null);
-    }
 }

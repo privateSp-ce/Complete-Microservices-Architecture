@@ -1,6 +1,8 @@
 package com.foodexpress.user.controller;
 
+import com.foodexpress.user.dto.AddressDto;
 import com.foodexpress.user.dto.ApiResponse;
+import com.foodexpress.user.dto.UserProfileDto;
 import com.foodexpress.user.dto.request.PasswordChangeRequest;
 import com.foodexpress.user.dto.request.UserUpdateRequest;
 import com.foodexpress.user.dto.response.UserResponse;
@@ -11,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * REST Controller for user profile management
@@ -50,7 +54,7 @@ public class UserController {
         String traceId = getTraceId();
         log.info("Get current user profile request, TraceId: {}", traceId);
 
-        UserResponse user = userService.getCurrentUserProfile();
+        UserResponse user = userService.getCurrentUserProfileResponse();
 
         ApiResponse<UserResponse> response = ApiResponse.success(
                 user,
@@ -181,5 +185,29 @@ public class UserController {
         );
 
         return ResponseEntity.ok(response);
+    }
+
+    // --- New Features (Addresses & Enhanced Profile) ---
+
+    @PostMapping("/addresses")
+    public ResponseEntity<Void> addAddress(@Valid @RequestBody AddressDto addressDto) {
+        userService.addAddress(addressDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/addresses")
+    public ResponseEntity<List<AddressDto>> getUserAddresses() {
+        return ResponseEntity.ok(userService.getUserAddresses());
+    }
+
+    @GetMapping("/profile-extended")
+    public ResponseEntity<UserProfileDto> getExtendedProfile() {
+        return ResponseEntity.ok(userService.getUserProfile());
+    }
+
+    @PutMapping("/profile-extended")
+    public ResponseEntity<Void> updateExtendedProfile(@RequestBody UserProfileDto profileDto) {
+        userService.updateUserProfile(profileDto);
+        return ResponseEntity.ok().build();
     }
 }

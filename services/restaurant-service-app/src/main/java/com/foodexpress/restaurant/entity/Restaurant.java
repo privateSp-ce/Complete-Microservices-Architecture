@@ -132,6 +132,10 @@ public class Restaurant {
     @Builder.Default
     private List<MenuItem> menuItems = new ArrayList<>();
 
+    @Field("reviews")
+    @Builder.Default
+    private List<Review> reviews = new ArrayList<>();
+
     @CreatedDate
     @Field("created_at")
     private LocalDateTime createdAt;

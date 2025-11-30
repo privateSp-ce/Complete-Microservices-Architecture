@@ -1,5 +1,6 @@
 package com.foodexpress.restaurant.service.impl;
 
+import com.foodexpress.restaurant.dto.ReviewDto;
 import com.foodexpress.restaurant.dto.common.AddressDTO;
 import com.foodexpress.restaurant.dto.common.GeoLocationDTO;
 import com.foodexpress.restaurant.dto.common.PageResponse;
@@ -9,6 +10,7 @@ import com.foodexpress.restaurant.dto.request.RestaurantUpdateRequest;
 import com.foodexpress.restaurant.dto.response.RestaurantResponse;
 import com.foodexpress.restaurant.dto.response.RestaurantSummaryResponse;
 import com.foodexpress.restaurant.entity.Restaurant;
+import com.foodexpress.restaurant.entity.Review;
 import com.foodexpress.restaurant.exception.DuplicateResourceException;
 import com.foodexpress.restaurant.exception.ResourceNotFoundException;
 import com.foodexpress.restaurant.repository.RestaurantRepository;
@@ -287,13 +289,36 @@ public class RestaurantServiceImpl implements RestaurantService {
         return mapToRestaurantResponse(updatedRestaurant);
     }
 
+    // --- New Features ---
+
+    @Override
+    public void addReview(String restaurantId, ReviewDto reviewDto) {
+        Restaurant restaurant = restaurantRepository.findById(restaurantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Restaurant not found with ID: " + restaurantId));
+
+        Review review = new Review();
+        review.setRating(reviewDto.getRating());
+        review.setComment(reviewDto.getComment());
+        // In production, get current user from security context
+        review.setUserId("current-user-id");
+        review.setUserName("Current User");
+
+        restaurant.getReviews().add(review);
+        restaurantRepository.save(restaurant);
+    }
+
+    @Override
+    public List<Restaurant> searchByName(String query) {
+        return restaurantRepository.searchByName(query);
+    }
+
     // Helper methods
     private RestaurantResponse mapToRestaurantResponse(Restaurant restaurant) {
         return RestaurantResponse.builder()
                 .id(restaurant.getId())
                 .name(restaurant.getName())
                 .description(restaurant.getDescription())
-                .ownerUserId(restaurant.getOwnerUserId().toString())
+                .ownerUserId(restaurant.getOwnerUserId() != null ? restaurant.getOwnerUserId().toString() : null)
                 .phoneNumber(restaurant.getPhone())
                 .email(restaurant.getEmail())
                 .address(AddressDTO.builder()

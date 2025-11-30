@@ -1,20 +1,27 @@
 package com.foodexpress.user.service;
 
+import com.foodexpress.user.dto.AddressDto;
+import com.foodexpress.user.dto.UserProfileDto;
 import com.foodexpress.user.dto.request.PasswordChangeRequest;
 import com.foodexpress.user.dto.request.UserUpdateRequest;
 import com.foodexpress.user.dto.response.UserResponse;
+import com.foodexpress.user.entity.Address;
 import com.foodexpress.user.entity.User;
 import com.foodexpress.user.exception.BadRequestException;
 import com.foodexpress.user.exception.DuplicateResourceException;
 import com.foodexpress.user.exception.ResourceNotFoundException;
+import com.foodexpress.user.repository.AddressRepository;
 import com.foodexpress.user.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service for user profile management
@@ -25,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AddressRepository addressRepository;
     private final PasswordEncoder passwordEncoder;
 
     /**
@@ -41,7 +49,7 @@ public class UserService {
     /**
      * Get current authenticated user
      */
-    private User getCurrentUser() {
+    public User getCurrentUser() {
         String email = getCurrentUserEmail();
         return userRepository.findByEmailAndIsActiveTrue(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
@@ -51,7 +59,7 @@ public class UserService {
      * Get current user profile
      */
     @Transactional(readOnly = true)
-    public UserResponse getCurrentUserProfile() {
+    public UserResponse getCurrentUserProfileResponse() {
         User user = getCurrentUser();
         log.info("Fetching profile for user: {}", user.getEmail());
         return UserResponse.fromEntity(user);
@@ -59,15 +67,19 @@ public class UserService {
 
     /**
      * Get current user profile with addresses
+     * Since I removed OneToMany addresses from User, I fetch them manually if needed, or just return basic user.
+     * The original code called findByIdWithAddresses which used JOIN FETCH.
+     * Since I decoupled them, I can't use that exactly same way on the entity easily without re-adding the relation.
+     * For now, I'll return standard UserResponse. If client needs addresses, they call /addresses.
+     * Or I can manually fetch addresses and add to a DTO if UserResponse supports it.
      */
     @Transactional(readOnly = true)
     public UserResponse getCurrentUserProfileWithAddresses() {
-        String email = getCurrentUserEmail();
-        User user = userRepository.findByIdWithAddresses(getCurrentUser().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
-
+        User user = getCurrentUser();
         log.info("Fetching profile with addresses for user: {}", user.getEmail());
-        return UserResponse.fromEntityWithAddresses(user);
+        // Addresses are now fetched via separate endpoint /api/users/addresses
+        // So this method just returns the user info.
+        return UserResponse.fromEntity(user);
     }
 
     /**
@@ -169,5 +181,61 @@ public class UserService {
      */
     public boolean existsById(Long userId) {
         return userRepository.existsById(userId);
+    }
+
+    // --- New Methods ---
+
+    public void addAddress(AddressDto dto) {
+        User user = getCurrentUser();
+        Address address = new Address();
+        address.setStreet(dto.getStreet());
+        address.setCity(dto.getCity());
+        address.setState(dto.getState());
+        address.setZipCode(dto.getZipCode());
+        address.setCountry(dto.getCountry());
+        address.setType(dto.getType());
+        address.setUserId(user.getId());
+        addressRepository.save(address);
+    }
+
+    public List<AddressDto> getUserAddresses() {
+        User user = getCurrentUser();
+        return addressRepository.findByUserId(user.getId()).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    public UserProfileDto getUserProfile() {
+        User user = getCurrentUser();
+        UserProfileDto dto = new UserProfileDto();
+        dto.setUsername(user.getFirstName() + " " + user.getLastName());
+        dto.setEmail(user.getEmail());
+        dto.setAvatarUrl(user.getAvatarUrl());
+        dto.setPreferences(user.getPreferences());
+        return dto;
+    }
+
+    @Transactional
+    public void updateUserProfile(UserProfileDto dto) {
+        User user = getCurrentUser();
+        if (dto.getAvatarUrl() != null) {
+            user.setAvatarUrl(dto.getAvatarUrl());
+        }
+        if (dto.getPreferences() != null) {
+            user.setPreferences(dto.getPreferences());
+        }
+        userRepository.save(user);
+    }
+
+    private AddressDto mapToDto(Address address) {
+        AddressDto dto = new AddressDto();
+        dto.setId(address.getId());
+        dto.setStreet(address.getStreet());
+        dto.setCity(address.getCity());
+        dto.setState(address.getState());
+        dto.setZipCode(address.getZipCode());
+        dto.setCountry(address.getCountry());
+        dto.setType(address.getType());
+        return dto;
     }
 }

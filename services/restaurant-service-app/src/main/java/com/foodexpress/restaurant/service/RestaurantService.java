@@ -5,7 +5,9 @@ import com.foodexpress.restaurant.dto.request.RestaurantRegistrationRequest;
 import com.foodexpress.restaurant.dto.request.RestaurantSearchRequest;
 import com.foodexpress.restaurant.dto.request.RestaurantUpdateRequest;
 import com.foodexpress.restaurant.dto.response.RestaurantResponse;
+import com.foodexpress.restaurant.dto.ReviewDto;
 import com.foodexpress.restaurant.dto.response.RestaurantSummaryResponse;
+import com.foodexpress.restaurant.entity.Restaurant;
 
 import java.util.List;
 
@@ -13,6 +15,10 @@ import java.util.List;
  * Service interface for Restaurant business logic
  */
 public interface RestaurantService {
+
+    void addReview(String restaurantId, ReviewDto reviewDto);
+
+    List<Restaurant> searchByName(String query);
 
     /**
      * Register a new restaurant
