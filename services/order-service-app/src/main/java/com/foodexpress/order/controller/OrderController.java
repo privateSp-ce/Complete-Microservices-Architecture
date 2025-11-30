@@ -8,25 +8,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-//@RequestMapping("/orders") -> no need of this as we are doing this from api gateway itself
-//@CrossOrigin(origins = "*") -> no need as we already configured global config cors
 @RequestMapping("/api/v1/orders")
 @RefreshScope
 @Slf4j
 public class OrderController {
 
     private final OrderService orderService;
-    private final com.foodexpress.order.service.OrderStateMachineService orderStateMachineService;
 
-    public OrderController(OrderService orderService, com.foodexpress.order.service.OrderStateMachineService orderStateMachineService) {
+    public OrderController(OrderService orderService) {
         this.orderService = orderService;
-        this.orderStateMachineService = orderStateMachineService;
-    }
-
-    @PutMapping("/{id}/status")
-    public ResponseEntity<Void> updateStatus(@PathVariable Long id, @RequestParam com.foodexpress.order.enums.OrderStatus status) {
-        orderStateMachineService.updateStatus(id, status);
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/place")
@@ -35,11 +25,37 @@ public class OrderController {
             @RequestBody OrderRequest orderRequest
     ) {
         log.info("Placing order for User ID: {}", userId);
-
-        // Call Business Logic
         String orderTrackingId = orderService.placeOrder(userId, orderRequest);
-
         return ResponseEntity.ok("Order placed successfully! Tracking ID: " + orderTrackingId);
     }
 
+    @PostMapping("/{orderTrackingNumber}/cancel")
+    public ResponseEntity<Void> cancelOrder(@PathVariable String orderTrackingNumber) {
+        orderService.cancelOrder(orderTrackingNumber);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderTrackingNumber}/prepare")
+    public ResponseEntity<Void> startPreparation(@PathVariable String orderTrackingNumber) {
+        orderService.startPreparation(orderTrackingNumber);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderTrackingNumber}/ready")
+    public ResponseEntity<Void> readyForPickup(@PathVariable String orderTrackingNumber) {
+        orderService.readyForPickup(orderTrackingNumber);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderTrackingNumber}/deliver")
+    public ResponseEntity<Void> startDelivery(@PathVariable String orderTrackingNumber) {
+        orderService.startDelivery(orderTrackingNumber);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{orderTrackingNumber}/complete")
+    public ResponseEntity<Void> completeDelivery(@PathVariable String orderTrackingNumber) {
+        orderService.completeDelivery(orderTrackingNumber);
+        return ResponseEntity.ok().build();
+    }
 }
