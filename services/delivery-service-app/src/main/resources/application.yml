@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: delivery-service-app
+  config:
+    import: optional:configserver:http://localhost:8888

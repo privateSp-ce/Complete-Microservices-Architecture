@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FullMenuResponse {
-    private Long restaurantId;
+    private String restaurantId;
     private String restaurantName;
     private List<MenuCategoryWithItems> categories;
 
@@ -21,7 +21,7 @@ public class FullMenuResponse {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MenuCategoryWithItems {
-        private Long categoryId;
+        private String categoryId;
         private String categoryName;
         private String categoryDescription;
         private Integer displayOrder;

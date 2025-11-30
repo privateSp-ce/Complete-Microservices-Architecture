@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RestaurantResponse {
-    private Long id;
+    private String id;
     private String name;
     private String description;
     private String ownerUserId;
