@@ -5,6 +5,7 @@ import com.foodexpress.order.client.PaymentServiceClient;
 import com.foodexpress.order.dto.*;
 import com.foodexpress.order.entity.Order;
 import com.foodexpress.order.enums.OrderStatus;
+import com.foodexpress.order.enums.PaymentMethod;
 import com.foodexpress.order.enums.PaymentStatus;
 import com.foodexpress.order.repository.OrderRepository;
 import com.foodexpress.order.service.OrderService;
@@ -20,11 +21,11 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -67,6 +68,7 @@ class FullOrderFlowSimulationTest {
         String userId = "1"; // From User Service Seeder
         OrderRequest checkoutRequest = new OrderRequest();
         checkoutRequest.setDeliveryAddress("Flat 101, Tech Park, Hyderabad"); // From User Service Address
+        checkoutRequest.setPaymentMethod(PaymentMethod.UPI);
 
         // 2. MOCK CART SERVICE (Simulating response from Cart Service)
         // In a real flow, Cart Service would fetch item details from Restaurant Service.
@@ -122,5 +124,31 @@ class FullOrderFlowSimulationTest {
         // In a real integration test, we would query the DB to check status.
         // Here we verify the service interaction.
         // verify(orderStateService).transitionOrder(orderTrackingId, OrderStatus.CONFIRMED);
+    }
+
+    @Test
+    void simulate_SadPath_EmptyCart() {
+        // --- SCENARIO START ---
+        // Frontend: User tries to place order but Cart has expired or is empty
+
+        String userId = "1";
+        OrderRequest checkoutRequest = new OrderRequest();
+
+        // Mock Empty Cart
+        CartResponse emptyCart = CartResponse.builder()
+                .items(Collections.emptyList())
+                .build();
+        when(cartServiceClient.getCart(userId)).thenReturn(emptyCart);
+        when(transactionTemplate.execute(any())).thenAnswer(invocation -> {
+            TransactionCallback callback = invocation.getArgument(0);
+            return callback.doInTransaction(null);
+        });
+
+        // Verify Exception is thrown (which GlobalExceptionHandler will catch in Controller)
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            orderService.placeOrder(userId, checkoutRequest);
+        });
+
+        assertEquals("Cart is empty! Cannot place order.", exception.getMessage());
     }
 }

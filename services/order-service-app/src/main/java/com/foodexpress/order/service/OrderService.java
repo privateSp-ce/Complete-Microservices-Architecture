@@ -52,10 +52,11 @@ public class OrderService {
         // 2. Process Payment (External Call - Outside Transaction)
         PaymentResponse paymentResponse;
         try {
+            String method = request.getPaymentMethod() != null ? request.getPaymentMethod().name() : "CARD";
             PaymentRequest paymentRequest = PaymentRequest.builder()
                     .orderId(order.getOrderTrackingNumber())
                     .amount(order.getTotalAmount().doubleValue())
-                    .paymentMethod("CARD")
+                    .paymentMethod(method)
                     .build();
 
             paymentResponse = paymentServiceClient.processPayment(paymentRequest);
