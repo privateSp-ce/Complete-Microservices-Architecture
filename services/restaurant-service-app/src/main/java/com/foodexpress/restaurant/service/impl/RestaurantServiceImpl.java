@@ -293,7 +293,7 @@ public class RestaurantServiceImpl implements RestaurantService {
                 .id(restaurant.getId())
                 .name(restaurant.getName())
                 .description(restaurant.getDescription())
-                .ownerUserId(restaurant.getOwnerUserId().toString())
+                .ownerUserId(restaurant.getOwnerUserId() != null ? restaurant.getOwnerUserId().toString() : null)
                 .phoneNumber(restaurant.getPhone())
                 .email(restaurant.getEmail())
                 .address(AddressDTO.builder()

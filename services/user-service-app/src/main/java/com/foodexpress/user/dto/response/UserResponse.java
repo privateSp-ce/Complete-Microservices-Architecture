@@ -45,7 +45,8 @@ public class UserResponse {
     @JsonProperty("phone_verified")
     private Boolean phoneVerified;
 
-    private List<AddressResponse> addresses;
+    // Removed addresses to simplify response object and break circular dependencies.
+    // Addresses should be fetched via a separate endpoint.
 
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
@@ -72,18 +73,4 @@ public class UserResponse {
                 .build();
     }
 
-    /**
-     * Convert User entity to UserResponse DTO with addresses
-     */
-    public static UserResponse fromEntityWithAddresses(User user) {
-        UserResponse response = fromEntity(user);
-        if (user.getAddresses() != null && !user.getAddresses().isEmpty()) {
-            response.setAddresses(
-                    user.getAddresses().stream()
-                            .map(AddressResponse::fromEntity)
-                            .collect(Collectors.toList())
-            );
-        }
-        return response;
-    }
 }
